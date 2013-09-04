@@ -1,12 +1,15 @@
-main: main.o libuv/libuv.a
-	$(CC) main.o libuv/libuv.a -o main -lpthread
+main: main.o buv.o libuv/libuv.a
+	$(CC) main.o buv.o libuv/libuv.a -o main -lpthread
 
-%.o: %.c
-	$(CC) --std=c89 -D_GNU_SOURCE -Wall -c $< -o $@ -Ilibuv/include
+main.o: main.c
+	$(CC) -c $< -o $@ -Wall -Werror -Ilibuv/include -I.
+
+%.o: %.c %.h
+	$(CC) -c $< -o $@ -Wall -Werror -Ilibuv/include -I.
 
 libuv/libuv.a:
 	CPPFLAGS=-fPIC $(MAKE) -C libuv
 
 clean:
 	make -C libuv clean
-	rm -f *.o main
+	rm -f *.o *.a main
