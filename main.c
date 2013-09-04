@@ -13,25 +13,23 @@ static void start_timer(const char* data, uint64_t timeout, uint64_t repeat) {
 int main() {
   printf("START\n");
 
-  start_timer("one", 200, 0);
-  start_timer("two", 400, 0);
+  start_timer("one", 1000, 0);
+  start_timer("two", 2000, 0);
 
   bevent_t* event;
   while ((event = buv_next())) {
     const char* data = (const char*)event->handle->data;
     switch (event->type) {
-      case BTIMER_TIMEOUT:
+      case BUV_TIMER:
         printf("%s.ontimeout\n", data);
         uv_timer_stop((uv_timer_t*)event->handle);
         buv_close(event->handle);
         break;
-      case BHANDLE_CLOSE:
+      case BUV_CLOSE:
         printf("%s.onclose\n", data);
         free(event->handle);
         break;
-      default:
-        fprintf(stderr, "ERROR: Unknown event type %d\n", event->type);
-        return -1;
+      default: break;
     }
     buv_dispose(event);
   }
